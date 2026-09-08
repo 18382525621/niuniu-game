@@ -97,6 +97,7 @@
       <div class="chip-box"><div class="l">我的筹码</div><div class="v" id="chips">1000</div></div>
       <div class="info-box"><div class="l">第几局</div><div class="v" id="round">1</div></div>
       <div class="info-box"><div class="l">本局庄家</div><div class="v" id="bankerName">—</div></div>
+      <div class="info-box"><div class="l">最高/胜率</div><div class="v" id="stats">—</div></div>
     </div>
 
     <div id="table"></div>
@@ -120,6 +121,7 @@
       <button class="act btn-nograb" id="btnNoGrab" style="display:none">不抢</button>
       <button class="act btn-flip" id="btnFlip" style="display:none">摊牌结算</button>
       <button class="act btn-again" id="btnAgain" style="display:none">下一局</button>
+      <button class="act btn-again" id="btnRestart" style="display:none">换桌重开</button>
     </div>
 
     <div class="result" id="result"></div>
@@ -184,13 +186,22 @@ function log(msg){const c=$('logContent');c.innerHTML=`<div>${msg}</div>`+c.inne
 /* ---------- 状态 ---------- */
 let seats=[], bankerIndex=0, round=1, numBots=3, phase='idle';
 
+/* 本地持久化：战绩 + 筹码（刷新不丢） */
+function loadStats(){try{return JSON.parse(localStorage.getItem('niuniu_stats'))||{rounds:0,wins:0,losses:0,best:1000};}catch(e){return {rounds:0,wins:0,losses:0,best:1000};}}
+function saveStats(s){try{localStorage.setItem('niuniu_stats',JSON.stringify(s));}catch(e){}}
+let stats=loadStats();
+function loadChips(){const c=parseInt(localStorage.getItem('niuniu_chips'));return (c&&c>=10)?c:1000;}
+function saveChips(c){try{localStorage.setItem('niuniu_chips',c);}catch(e){}}
+function updateStatsUI(){$('stats').textContent='💰'+stats.best+' · '+stats.wins+'/'+stats.rounds;}
+
 function startGame(n){
   numBots=n; seats=[];
-  seats.push({name:'你',isHuman:true,cards:[],chips:1000,bet:0,hand:null,grabbed:false,result:null});
+  let myChips=loadChips();
+  seats.push({name:'你',isHuman:true,cards:[],chips:myChips,bet:0,hand:null,grabbed:false,result:null});
   for(let i=0;i<n;i++) seats.push({name:BOT_NAMES[i],isHuman:false,cards:[],chips:1000,bet:0,hand:null,grabbed:false,result:null});
   round=1; bankerIndex=0; phase='idle';
   $('start').style.display='none'; $('game').style.display='flex';
-  $('round').textContent=round; renderAll(); setChips();
+  $('round').textContent=round; renderAll(); setChips(); updateStatsUI();
   setPhase('idle');
   log(`开局：${n} 个人机入座，祝你好运 🍀`);
 }
@@ -252,6 +263,10 @@ function doShowdown(){
   });
   // 破产补给，保证游戏继续
   seats.forEach(s=>{ if(s.chips<=0){ s.chips=1000; log(`${s.name} 筹码归零，已补充至 1000`); } });
+  // 记录战绩 + 持久化
+  stats.rounds++; if(net>0)stats.wins++; else if(net<0)stats.losses++;
+  stats.best=Math.max(stats.best, seats[0].chips);
+  saveStats(stats); saveChips(seats[0].chips); updateStatsUI();
   setChips(); renderAll();
   const net=seats[0].chips-before;
   const r=$('result');
@@ -302,6 +317,7 @@ function setPhase(p){
   ng.style.display= p==='grab'?'inline-block':'none';
   f.style.display = p==='show'?'inline-block':'none';
   a.style.display = p==='done'?'inline-block':'none';
+  $('btnRestart').style.display = (p==='idle'||p==='done')?'inline-block':'none';
   $('bet').disabled = (p!=='idle');
 }
 
@@ -311,6 +327,7 @@ $('btnGrab').onclick=()=>doGrab(true);
 $('btnNoGrab').onclick=()=>doGrab(false);
 $('btnFlip').onclick=doShowdown;
 $('btnAgain').onclick=nextRound;
+$('btnRestart').onclick=()=>{ $('game').style.display='none'; $('start').style.display='block'; };
 document.querySelectorAll('.bet-quick button').forEach(b=>b.onclick=()=>{
   const v=b.dataset.b; const inp=$('bet');
   if(v==='max') inp.value=seats[0]?seats[0].chips:0;
