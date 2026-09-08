@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>牛牛小游戏 · 单挑庄家</title>
+<style>
+  :root{
+    --felt:#0b6b3a; --felt2:#0a5a31; --gold:#f4c430; --card-bg:#fff;
+    --red:#d40000; --black:#1a1a1a; --panel:rgba(0,0,0,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    background:radial-gradient(circle at 50% 18%,var(--felt),var(--felt2) 70%);
+    min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center;
+    padding:14px 12px 30px;
+  }
+  h1{font-size:22px;letter-spacing:2px;text-shadow:0 2px 4px rgba(0,0,0,.4);
+     margin-top:4px;display:flex;align-items:center;gap:8px;}
+  h1 .badge{font-size:12px;background:var(--gold);color:#222;padding:2px 8px;
+     border-radius:20px;font-weight:700;letter-spacing:0;}
+  .topbar{display:flex;gap:10px;margin:12px 0;flex-wrap:wrap;justify-content:center;}
+  .chip-box,.bet-box{background:var(--panel);padding:10px 16px;border-radius:12px;
+     text-align:center;min-width:120px;}
+  .chip-box .v{font-size:24px;font-weight:800;color:var(--gold);}
+  .chip-box .l,.bet-box .l{font-size:12px;opacity:.8;}
+  .bet-box input{width:90px;font-size:18px;text-align:center;border:none;border-radius:8px;
+     padding:6px;margin-top:4px;font-weight:700;background:#fff;color:#222;}
+  .bet-quick{display:flex;gap:6px;justify-content:center;margin-top:8px;}
+  .bet-quick button{background:#fff;color:#0a5a31;border:none;border-radius:8px;
+     padding:4px 10px;font-weight:700;cursor:pointer;font-size:13px;}
+  .area{width:100%;max-width:560px;margin:8px 0;}
+  .area .label{display:flex;justify-content:space-between;align-items:center;
+     font-size:14px;margin-bottom:6px;opacity:.92;}
+  .area .label .pt{background:var(--panel);padding:3px 10px;border-radius:8px;
+     font-weight:700;color:var(--gold);min-height:24px;display:inline-flex;align-items:center;}
+  .cards{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:104px;}
+  .card{
+    width:64px;height:92px;background:var(--card-bg);border-radius:8px;
+    position:relative;box-shadow:0 3px 6px rgba(0,0,0,.35);user-select:none;
+    transition:transform .25s;flex:0 0 auto;
+  }
+  .card.red{color:var(--red);} .card.black{color:var(--black);}
+  .card .corner{position:absolute;font-size:13px;font-weight:800;line-height:1;
+     display:flex;flex-direction:column;align-items:center;}
+  .card .tl{top:5px;left:6px;} .card .br{bottom:5px;right:6px;transform:rotate(180deg);}
+  .card .pip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+     font-size:30px;}
+  .card.back{background:repeating-linear-gradient(45deg,#1f6fb0,#1f6fb0 6px,#2a86d0 6px,#2a86d0 12px);}
+  .card.back::after{content:"牛";position:absolute;top:50%;left:50%;
+     transform:translate(-50%,-50%);font-size:30px;color:#fff;font-weight:800;opacity:.85;}
+  .card.hl{outline:3px solid var(--gold);outline-offset:1px;transform:translateY(-4px);}
+  .controls{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center;}
+  button.act{font-size:16px;font-weight:800;padding:12px 26px;border:none;border-radius:30px;
+     cursor:pointer;letter-spacing:1px;transition:transform .1s;}
+  button.act:active{transform:scale(.96);}
+  button.act:disabled{opacity:.45;cursor:not-allowed;}
+  .btn-deal{background:var(--gold);color:#222;}
+  .btn-flip{background:#fff;color:#0a5a31;}
+  .btn-again{background:#ff7a45;color:#fff;}
+  .result{margin-top:14px;font-size:20px;font-weight:800;min-height:28px;
+     text-align:center;text-shadow:0 2px 4px rgba(0,0,0,.4);}
+  .result.win{color:#7CFC00;} .result.lose{color:#ff6b6b;} .result.tie{color:var(--gold);}
+  .log{max-width:560px;width:100%;margin-top:14px;background:var(--panel);
+     border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.7;max-height:150px;overflow:auto;}
+  .log h3{font-size:13px;opacity:.8;margin-bottom:4px;font-weight:600;}
+  .help{margin-top:16px;max-width:560px;font-size:12px;opacity:.8;line-height:1.7;text-align:left;}
+  .help b{color:var(--gold);}
+  .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);
+     padding:8px 18px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;}
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+  <h1>🐂 牛牛小游戏 <span class="badge">单挑庄家</span></h1>
+
+  <div class="topbar">
+    <div class="chip-box"><div class="l">我的筹码</div><div class="v" id="chips">1000</div></div>
+    <div class="bet-box">
+      <div class="l">下注</div>
+      <input id="bet" type="number" value="100" min="10" step="10">
+      <div class="bet-quick">
+        <button data-b="50">+50</button>
+        <button data-b="100">+100</button>
+        <button data-b="500">+500</button>
+        <button data-b="max">ALL</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="area">
+    <div class="label"><span>🤖 庄家（电脑）</span><span class="pt" id="bankerType">—</span></div>
+    <div class="cards" id="bankerCards"></div>
+  </div>
+
+  <div class="area">
+    <div class="label"><span>🙋 你（闲家）</span><span class="pt" id="playerType">—</span></div>
+    <div class="cards" id="playerCards"></div>
+  </div>
+
+  <div class="controls">
+    <button class="act btn-deal" id="btnDeal">发牌</button>
+    <button class="act btn-flip" id="btnFlip" disabled>摊牌</button>
+    <button class="act btn-again" id="btnAgain" disabled>再来一局</button>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="log"><h3>战况记录</h3><div id="logContent">—</div></div>
+
+  <div class="help">
+    <b>玩法：</b>你与庄家各发 5 张牌。点数：A=1，2~10=面值，J/Q/K=10。
+    从 5 张中找出 3 张点数和为 10 的倍数（即"有牛"），剩下 2 张点数和的个位数就是你的"牛数"；
+    若个位为 0 即为 <b>牛牛</b>（最大）。比大小：牛牛 &gt; 牛9 &gt; … &gt; 牛1 &gt; 无牛。
+    同等级比最大单牌（K最大，♠&gt;♥&gt;♣&gt;♦）。特殊牌型：<b>五花牛/炸弹</b> 赔率更高，<b>五小牛</b> 最大。<br>
+    <b>赔率：</b>牛1~6 赢 1 倍，牛7~9 赢 2 倍，牛牛 赢 3 倍，五花牛/炸弹 赢 4 倍，五小牛 赢 5 倍；输则扣下注额。
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/* ---------- 牌堆 ---------- */
+const SUITS=[{s:'♠',r:4},{s:'♥',r:3},{s:'♣',r:2},{s:'♦',r:1}];
+const RANKS=[
+  {r:'A',v:1},{r:'2',v:2},{r:'3',v:3},{r:'4',v:4},{r:'5',v:5},{r:'6',v:6},
+  {r:'7',v:7},{r:'8',v:8},{r:'9',v:9},{r:'10',v:10},{r:'J',v:10},{r:'Q',v:10},{r:'K',v:10}
+];
+function buildDeck(){
+  const d=[];
+  SUITS.forEach(su=>RANKS.forEach(rk=>d.push({rank:rk.r,value:rk.v,suit:su.s,suitRank:su.r,color:(su.s==='♥'||su.s==='♦')?'red':'black'})));
+  return d;
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function deal(n){const d=shuffle(buildDeck());return d.slice(0,n*2);} // 闲+庄各5
+
+/* ---------- 牛型判定 ---------- */
+function evaluate(cards){
+  const sum=cards.reduce((s,c)=>s+c.value,0);
+  const maxCard=Math.max(...cards.map(c=>c.value*10+c.suitRank));
+  const tail={};
+  cards.forEach(c=>tail[c.value]=(tail[c.value]||0)+1);
+
+  // 五小牛
+  if(cards.every(c=>c.value<=4)&&sum<=10) return hand(13,'五小牛',null,maxCard);
+  // 五花牛（全 J/Q/K）优先于炸弹
+  if(cards.every(c=>['J','Q','K'].includes(c.rank))) return hand(11,'五花牛',null,maxCard);
+  // 炸弹（四张同点）
+  if(Object.values(tail).some(v=>v>=4)) return hand(12,'炸弹',null,maxCard);
+
+  let best=null;
+  for(let i=0;i<5;i++)for(let j=i+1;j<5;j++)for(let k=j+1;k<5;k++){
+    if((cards[i].value+cards[j].value+cards[k].value)%10===0){
+      const rest=[];for(let x=0;x<5;x++)if(x!==i&&x!==j&&x!==k)rest.push(x);
+      const s2=cards[rest[0]].value+cards[rest[1]].value;
+      const niu=s2%10;                 // 0 => 牛牛
+      const lvl=niu===0?10:niu;
+      if(!best||lvl>best.lvl) best={lvl,niu,combo:[i,j,k]};
+    }
+  }
+  if(best){
+    const type=best.niu===0?'牛牛':'牛'+best.niu;
+    return hand(best.lvl,type,best.combo,maxCard);
+  }
+  return hand(0,'无牛',null,maxCard);
+}
+function hand(level,type,combo,maxCard){return {level,type,combo,maxCard};}
+
+function compare(a,b){
+  if(a.level!==b.level) return a.level-b.level;
+  return a.maxCard-b.maxCard;          // 大者胜
+}
+
+/* ---------- 赔率 ---------- */
+function payout(level){return level>=13?5:level===12||level===11?4:level===10?3:level>=7?2:1;}
+
+/* ---------- 渲染 ---------- */
+function cardEl(card,faceUp=true,hl=false){
+  const d=document.createElement('div');
+  d.className='card '+(faceUp?card.color:'back')+(hl?' hl':'');
+  if(faceUp){
+    d.innerHTML=`<span class="corner tl">${card.rank}<span>${card.suit}</span></span>`+
+                `<span class="pip">${card.suit}</span>`+
+                `<span class="corner br">${card.rank}<span>${card.suit}</span></span>`;
+  }
+  return d;
+}
+function renderHand(el,cards,faceUp,combo){
+  el.innerHTML='';
+  cards.forEach((c,i)=>el.appendChild(cardEl(c,faceUp,combo&&combo.includes(i))));
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);}
+
+/* ---------- 状态 ---------- */
+let chips=1000, player=[], banker=[], roundOver=false, dealt=false;
+
+function $(id){return document.getElementById(id);}
+function setChips(){$('chips').textContent=chips;}
+
+function doDeal(){
+  const bet=Math.min(parseInt($('bet').value)||0, chips);
+  if(bet<10){toast('至少下注 10');return;}
+  if(bet>chips){toast('筹码不足');return;}
+  const cards=deal(5); player=cards.slice(0,5); banker=cards.slice(5,10);
+  renderHand($('playerCards'),player,true);
+  renderHand($('bankerCards'),banker,false);
+  const pe=evaluate(player);
+  $('playerType').textContent=pe.type;
+  $('bankerType').textContent='？？？';
+  $('result').textContent='';$('result').className='result';
+  roundOver=false; dealt=true;
+  $('btnDeal').disabled=true; $('btnFlip').disabled=false; $('btnAgain').disabled=true;
+  window._bet=bet;
+  log(`发牌完成，下注 ${bet}。你的牌型：${pe.type}`);
+}
+
+function doFlip(){
+  if(!dealt||roundOver)return;
+  renderHand($('bankerCards'),banker,true,evaluate(banker).combo);
+  const bp=evaluate(banker), pp=evaluate(player);
+  $('bankerType').textContent=bp.type;
+  const bet=window._bet;
+  const cmp=compare(pp,bp);
+  let res,cls,mult=1;
+  if(cmp>0){
+    mult=payout(pp.level); chips+=bet*mult;
+    res=`你赢！${pp.type} 胜 ${bp.type}，+${bet*mult}`; cls='win';
+  }else if(cmp<0){
+    chips-=bet; res=`你输！${pp.type} 不敌 ${bp.type}，-${bet}`; cls='lose';
+  }else{
+    res=`平局！${pp.type} 对 ${bp.type}，退还下注`; cls='tie';
+  }
+  setChips();
+  $('result').textContent=res; $('result').className='result '+cls;
+  roundOver=true;
+  $('btnFlip').disabled=true; $('btnAgain').disabled=false;
+  log(res);
+  if(chips<=0){toast('筹码归零，已重置');chips=1000;setChips();}
+}
+
+function reset(){dealt=false;roundOver=false;
+  $('playerCards').innerHTML='';$('bankerCards').innerHTML='';
+  $('playerType').textContent='—';$('bankerType').textContent='—';
+  $('result').textContent='';$('result').className='result';
+  $('btnDeal').disabled=false;$('btnFlip').disabled=true;$('btnAgain').disabled=true;
+}
+function log(msg){
+  const c=$('logContent');
+  c.innerHTML=`<div>${msg}</div>`+c.innerHTML;
+}
+
+/* ---------- 事件 ---------- */
+$('btnDeal').onclick=doDeal;
+$('btnFlip').onclick=doFlip;
+$('btnAgain').onclick=reset;
+document.querySelectorAll('.bet-quick button').forEach(b=>b.onclick=()=>{
+  const v=b.dataset.b; const inp=$('bet');
+  if(v==='max') inp.value=chips;
+  else inp.value=Math.min(chips,(parseInt(inp.value)||0)+parseInt(v));
+});
+setChips();
+</script>
+</body>
+</html>
