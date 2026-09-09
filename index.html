@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>赌城大冒险 · 德州 / 牛牛 / 打怪</title>
+<title>命运赌城 · RPG 冒险</title>
 <style>
-  :root{--bg:#0f1226;--panel:#1b2046;--panel2:#252c5e;--gold:#f4c430;--red:#ff5e5e;--green:#4ade80;--txt:#e8ecff;--dim:#9aa3d0;}
+  :root{--bg:#0f1226;--panel:#1b2046;--panel2:#252c5e;--gold:#f4c430;--red:#ff5e5e;--green:#4ade80;--txt:#e8ecff;--dim:#9aa3d0;
+    --q0:#cfd6ff;--q1:#5ee08a;--q2:#7aa8ff;--q3:#ffb24a;}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:radial-gradient(circle at 50% 0%,#1a2050,#0f1226 70%);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:10px 10px 30px;}
+  body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:radial-gradient(circle at 50% 0%,#241a4d,#0f1226 72%);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:10px 10px 30px;}
   h1{font-size:19px;letter-spacing:1px;margin:2px 0 6px;display:flex;align-items:center;gap:8px;}
   h1 .b{font-size:11px;background:var(--gold);color:#222;padding:2px 8px;border-radius:20px;font-weight:800;}
   .topbar{width:100%;max-width:680px;display:flex;gap:8px;align-items:center;background:var(--panel);padding:8px 12px;border-radius:12px;margin-bottom:10px;}
@@ -25,23 +26,24 @@
   .card.bk{background:repeating-linear-gradient(45deg,#2a3a8a,#2a3a8a 5px,#3a4db0 5px,#3a4db0 10px);}
   .card.bk::after{content:"?";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:18px;}
 
-  /* 主界面 */
   .hero{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
-  .hero .hs{background:var(--panel);border-radius:12px;padding:10px 14px;text-align:center;min-width:78px;}
+  .hero .hs{background:var(--panel);border-radius:12px;padding:10px 14px;text-align:center;min-width:74px;}
   .hero .hs span{font-size:11px;color:var(--dim);display:block;}
-  .hero .hs b{font-size:18px;color:var(--gold);}
+  .hero .hs b{font-size:17px;color:var(--gold);}
+  .hero .hs.rep b{color:#ff9d4a;} .hero .hs.luck b{color:#7aa8ff;}
+  .lucky{background:linear-gradient(135deg,#7aa8ff,#b07aff);color:#fff;border-radius:12px;padding:6px 12px;font-size:12px;font-weight:800;align-self:center;}
+
   .redeem{background:var(--panel);border-radius:12px;padding:10px 12px;margin:10px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
   .redeem input{flex:1;min-width:120px;background:#0f1330;color:var(--txt);border:1px solid #3a4280;border-radius:8px;padding:9px 12px;font-size:14px;}
   .redeem button{background:var(--gold);color:#222;border:none;border-radius:8px;padding:9px 16px;font-weight:800;cursor:pointer;}
   .redeem .msg{font-size:12px;color:var(--green);width:100%;min-height:14px;}
 
-  /* 赌场子标签 */
   .subtabs{display:flex;gap:8px;justify-content:center;margin-bottom:10px;}
   .subtabs button{background:var(--panel);color:var(--txt);border:none;border-radius:10px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;}
   .subtabs button.on{background:var(--gold);color:#222;}
+  .subtabs button.locked{opacity:.5;cursor:not-allowed;}
   .cpnl{display:none;} .cpnl.on{display:block;}
 
-  /* 大厅 */
   .tables{display:flex;flex-direction:column;gap:10px;}
   .trow{background:var(--panel);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;border:2px solid transparent;}
   .trow:hover{border-color:var(--gold);}
@@ -51,12 +53,12 @@
   .trow .dt{font-size:12px;color:var(--dim);}
   .trow .go{background:var(--gold);color:#222;padding:8px 16px;border-radius:20px;font-weight:800;font-size:13px;}
   .trow.locked .go{background:#555;color:#aaa;}
-  .acts{display:flex;gap:10px;margin-top:14px;}
-  .acts button{flex:1;background:var(--panel);color:var(--txt);border:none;border-radius:12px;padding:16px;font-weight:800;font-size:15px;cursor:pointer;}
+  .acts{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .acts button{flex:1;background:var(--panel);color:var(--txt);border:none;border-radius:12px;padding:14px;font-weight:800;font-size:15px;cursor:pointer;min-width:120px;}
   .acts button.shop{background:linear-gradient(135deg,#ff8a3d,#ff5e5e);color:#fff;}
   .acts button.casino{background:linear-gradient(135deg,#3da5ff,#5e5eff);color:#fff;}
+  .acts button.story{background:linear-gradient(135deg,#b07aff,#7aa8ff);color:#fff;}
 
-  /* 牌桌 */
   .seats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:6px 0;}
   .seat{background:var(--panel);border-radius:10px;padding:6px 8px;width:74px;text-align:center;border:2px solid transparent;}
   .seat.act{border-color:var(--gold);box-shadow:0 0 10px rgba(244,196,48,.5);}
@@ -82,27 +84,34 @@
   .b-fold{background:#444;color:#fff;} .b-call{background:#4ade80;color:#062;} .b-raise{background:var(--gold);color:#222;} .b-allin{background:var(--red);color:#fff;} .b-next{background:linear-gradient(135deg,#3da5ff,#5e5eff);color:#fff;}
   .rng{width:200px;}
   .log{background:var(--panel);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.6;max-height:110px;overflow:auto;margin-top:8px;color:var(--dim);}
-  .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);padding:8px 18px;border-radius:20px;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:20;}
+  .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);padding:8px 18px;border-radius:20px;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:30;}
   .toast.show{opacity:1;}
 
   /* 战斗 */
-  .combat{background:var(--panel);border-radius:14px;padding:16px;text-align:center;}
-  .mon{font-size:64px;margin:6px 0;}
+  .combat{background:linear-gradient(160deg,#2a1d4d,#1b2046);border-radius:14px;padding:16px;text-align:center;border:1px solid #3a2f6e;}
+  .mon{font-size:64px;margin:4px 0;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5));}
+  .mon.boss{animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
   .bar{height:16px;border-radius:8px;background:#333;overflow:hidden;margin:4px 0;}
-  .bar>i{display:block;height:100%;}
+  .bar>i{display:block;height:100%;transition:width .25s;}
   .bar.hp>i{background:linear-gradient(90deg,#ff5e5e,#ff8a3d);}
   .bar.mhp>i{background:linear-gradient(90deg,#4ade80,#3da5ff);}
   .cstat{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);}
-  .cbtns{display:flex;gap:8px;margin-top:12px;}
-  .cbtns button{flex:1;padding:14px;border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;color:#fff;}
+  .cbtns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+  .cbtns button{flex:1;min-width:64px;padding:12px 6px;border:none;border-radius:12px;font-weight:800;font-size:13px;cursor:pointer;color:#fff;}
   .atk{background:linear-gradient(135deg,#ff5e5e,#ff8a3d);} .heal{background:linear-gradient(135deg,#3da5ff,#5e5eff);} .flee{background:#555;}
+  .hv{background:linear-gradient(135deg,#b07aff,#7a5cff);} .dg{background:linear-gradient(135deg,#ffd24a,#ff9d4a);}
+  .cskill{font-size:10px;opacity:.8;display:block;}
+  .float{position:fixed;left:50%;top:40%;transform:translateX(-50%);font-weight:900;font-size:26px;pointer-events:none;z-index:40;animation:floatUp 1s forwards;text-shadow:0 2px 6px #000;}
+  @keyframes floatUp{from{opacity:1;top:40%;}to{opacity:0;top:28%;}}
 
   /* 商店 */
   .shoprow{background:var(--panel);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;}
   .shoprow .ic{font-size:30px;}
   .shoprow .nm{font-weight:800;} .shoprow .dt{font-size:12px;color:var(--dim);}
-  .shoprow button{margin-left:auto;background:var(--gold);color:#222;border:none;border-radius:20px;padding:8px 16px;font-weight:800;cursor:pointer;}
+  .shoprow button{margin-left:auto;background:var(--gold);color:#222;border:none;border-radius:20px;padding:8px 16px;font-weight:800;cursor:pointer;white-space:nowrap;}
   .shoprow button:disabled{background:#555;color:#aaa;cursor:not-allowed;}
+  .q0{color:var(--q0);} .q1{color:var(--q1);} .q2{color:var(--q2);} .q3{color:var(--q3);}
   .center{text-align:center;margin:20px 0;}
   .bigbtn{background:var(--gold);color:#222;border:none;border-radius:24px;padding:14px 30px;font-weight:800;font-size:16px;cursor:pointer;}
 
@@ -150,12 +159,29 @@
   .nn-startbtn{background:var(--gold);color:#222;border:none;border-radius:30px;padding:12px 40px;font-size:17px;font-weight:800;cursor:pointer;letter-spacing:1px;}
   .nn-help{margin-top:14px;max-width:660px;font-size:11.5px;opacity:.8;line-height:1.7;text-align:left;}
   .nn-help b{color:var(--gold);}
+
+  /* 弹窗 */
+  .modal{position:fixed;inset:0;background:rgba(6,8,20,.82);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;}
+  .modal .box{background:linear-gradient(160deg,#2a1d4d,#161a3a);border:1px solid #4a3f8e;border-radius:16px;max-width:520px;width:100%;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.6);max-height:84vh;overflow:auto;}
+  .modal h2{font-size:19px;color:var(--gold);margin-bottom:10px;}
+  .modal .body{font-size:14px;line-height:1.85;color:#dfe4ff;}
+  .modal .body p{margin-bottom:10px;}
+  .modal .body .em{color:#ffb24a;font-weight:700;}
+  .modal .body .dim{color:var(--dim);font-size:12px;}
+  .modal .btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  .modal .btns button{flex:1;min-width:120px;padding:13px;border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;background:var(--panel2);color:var(--txt);}
+  .modal .btns button.primary{background:var(--gold);color:#222;}
+  .modal .btns button.evil{background:linear-gradient(135deg,#ff5e5e,#ff8a3d);color:#fff;}
+  .ach-row{display:flex;gap:10px;align-items:center;background:var(--panel);border-radius:10px;padding:8px 12px;margin-bottom:8px;}
+  .ach-row .ic{font-size:22px;} .ach-row .nm{font-weight:800;} .ach-row .ds{font-size:11px;color:var(--dim);}
+  .ach-row.locked{opacity:.45;}
 </style>
 </head>
 <body>
-  <h1>🎰 赌城大冒险 <span class="b">德州 · 牛牛 · 打怪</span></h1>
+  <h1>🎰 命运赌城 <span class="b">RPG 冒险</span></h1>
   <div class="topbar">
-    <span>💰 金币</span><span class="gold" id="goldTop">200</span>
+    <span>💰</span><span class="gold" id="goldTop">200</span>
+    <span class="lucky" id="luckyBadge" style="display:none">🍀 运势</span>
     <div class="nav">
       <button id="navHome" class="on">主界面</button>
       <button id="navCasino">赌场</button>
@@ -170,6 +196,8 @@
       <div class="hs"><span>⚔️ 攻击</span><b id="homeAtk">10</b></div>
       <div class="hs"><span>❤️ 生命</span><b id="homeHp">85</b></div>
       <div class="hs"><span>🍀 幸运</span><b id="homeLuck">x1.0</b></div>
+      <div class="hs rep"><span>⭐ 声望</span><b id="homeRep">0</b></div>
+      <div class="hs luck"><span>🔮 幸运币</span><b id="homeLuckCoin">0</b></div>
     </div>
     <div class="redeem">
       <input id="redeemInput" placeholder="输入兑换码领取奖励" autocomplete="off">
@@ -180,9 +208,10 @@
     <div class="acts">
       <button class="casino" id="btnGoCasino">🎰 进入赌场</button>
       <button class="shop" id="btnGoShop2">🛒 升级装备</button>
+      <button class="story" id="btnGoStory">📜 剧情</button>
     </div>
     <p style="font-size:12px;color:var(--dim);text-align:center;margin-top:14px;line-height:1.7;">
-      金币是通用货币：去赌场赢牌、打怪爆金币、再到装备页升级战力。<br>金币归零就出门打怪，打赢了回来继续梭哈。
+      赢牌攒<span style="color:#ff9d4a">声望</span>解锁 VIP 牌桌；击败 <span style="color:#ffb24a">BOSS</span> 获得<span style="color:#7aa8ff">运势</span>增益影响牌局；<br>打怪掉落<span style="color:#7aa8ff">幸运币</span>与装备碎片，去装备页锻造品质。
     </p>
   </div>
 
@@ -193,7 +222,6 @@
       <button id="tabNiu">🐂 斗牛牛</button>
     </div>
 
-    <!-- 德州面板 -->
     <div class="cpnl on" id="pnlTexas">
       <div class="tables" id="tableList"></div>
       <div id="txTable" style="display:none">
@@ -223,7 +251,6 @@
       </div>
     </div>
 
-    <!-- 牛牛面板 -->
     <div class="cpnl" id="pnlNiu">
       <div class="nn-start" id="nnStart">
         <h2>欢迎入座 🐂</h2>
@@ -277,6 +304,11 @@
   </div>
 
   <div class="toast" id="toast"></div>
+  <div class="modal" id="modal"><div class="box">
+    <h2 id="modalTitle"></h2>
+    <div class="body" id="modalBody"></div>
+    <div class="btns" id="modalBtns"></div>
+  </div></div>
 
 <script>
 /* ================= 工具 / 全局状态 ================= */
@@ -285,77 +317,262 @@ const SUITB={s:'♠',h:'♥',c:'♣',d:'♦'};
 const RED=s=>(s==='h'||s==='d');
 const DOC=typeof document!=='undefined';
 function $(id){return DOC?document.getElementById(id):null;}
-function toast(m){if(!DOC)return;const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);}
+function toast(m){if(!DOC)return;const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500);}
 function rint(a,b){return a+Math.floor(Math.random()*(b-a+1));}
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function floatText(txt,color){if(!DOC)return;const f=document.createElement('div');f.className='float';f.style.color=color||'#fff';f.textContent=txt;document.body.appendChild(f);setTimeout(()=>f.remove(),1000);}
 
 /* 兑换码（如需自定义，改这里即可；请勿使用针对他人、含歧视或侮辱意味的词语） */
 const REDEEM_CODE='VIP2026';
 const REDEEM_REWARD=10000;
 
-const G={gold:200,equip:{weapon:1,armor:1,luck:1},table:null,poker:null,combat:null,taskLevel:0,redeemed:false};
-function atk(){return 8+G.equip.weapon*6;}
-function maxHp(){return 80+G.equip.armor*40;}
-function luckMult(){return 1+G.equip.luck*0.2;}
+const QNAMES=['普通','精良','史诗','传说'];
+const G={gold:200,equip:{weapon:1,armor:1,luck:1},quality:{weapon:0,armor:0,luck:0},
+  table:null,poker:null,combat:null,taskLevel:0,redeemed:false,
+  rep:0,luckCoins:0,shards:0,chapter:0,ach:{},buffs:{luckHands:0},
+  stats:{pWin:0,pHand:0,kills:0,boss:0,streak:0,bestStreak:0,nnWin:0}};
+
+function qualityBonus(kind){return 1+G.quality[kind]*0.25;}
+function atk(){return Math.round((8+G.equip.weapon*6)*qualityBonus('weapon'));}
+function maxHp(){return Math.round((80+G.equip.armor*40)*qualityBonus('armor'));}
+function luckMult(){return (1+G.equip.luck*0.2)*qualityBonus('luck');}
 function equipCost(kind){return {weapon:50*G.equip.weapon,armor:55*G.equip.armor,luck:70*G.equip.luck}[kind];}
-function save(){if(DOC){try{localStorage.setItem('th_gold',G.gold);localStorage.setItem('th_eq',JSON.stringify(G.equip));localStorage.setItem('th_tl',G.taskLevel);localStorage.setItem('th_red',G.redeemed?1:0);}catch(e){}}}
-function load(){if(DOC){try{G.gold=parseInt(localStorage.getItem('th_gold'))||200;const e=JSON.parse(localStorage.getItem('th_eq'));if(e)G.equip=e;G.taskLevel=parseInt(localStorage.getItem('th_tl'))||0;G.redeemed=localStorage.getItem('th_red')==='1';}catch(e){}}}
+function save(){if(DOC){try{localStorage.setItem('th_gold',G.gold);localStorage.setItem('th_eq',JSON.stringify(G.equip));localStorage.setItem('th_q',JSON.stringify(G.quality));localStorage.setItem('th_tl',G.taskLevel);localStorage.setItem('th_red',G.redeemed?1:0);localStorage.setItem('th_rep',G.rep);localStorage.setItem('th_lc',G.luckCoins);localStorage.setItem('th_sh',G.shards);localStorage.setItem('th_ch',G.chapter);localStorage.setItem('th_ach',JSON.stringify(G.ach));localStorage.setItem('th_buf',JSON.stringify(G.buffs));localStorage.setItem('th_st',JSON.stringify(G.stats));}catch(e){}}}
+function load(){if(DOC){try{G.gold=parseInt(localStorage.getItem('th_gold'))||200;const e=JSON.parse(localStorage.getItem('th_eq'));if(e)G.equip=e;const q=JSON.parse(localStorage.getItem('th_q'));if(q)G.quality=q;G.taskLevel=parseInt(localStorage.getItem('th_tl'))||0;G.redeemed=localStorage.getItem('th_red')==='1';G.rep=parseInt(localStorage.getItem('th_rep'))||0;G.luckCoins=parseInt(localStorage.getItem('th_lc'))||0;G.shards=parseInt(localStorage.getItem('th_sh'))||0;G.chapter=parseInt(localStorage.getItem('th_ch'))||0;G.ach=JSON.parse(localStorage.getItem('th_ach'))||{};G.buffs=JSON.parse(localStorage.getItem('th_buf'))||{luckHands:0};G.stats=JSON.parse(localStorage.getItem('th_st'))||G.stats;}catch(e){}}}
 
 /* ================= 导航 ================= */
 function show(screen){if(!DOC)return;['scrHome','scrCasino','scrShop'].forEach(s=>$(s).classList.remove('on'));$(screen).classList.add('on');
-  {const nav={'scrHome':'navHome','scrCasino':'navCasino','scrShop':'navShop'}[screen];['navHome','navCasino','navShop'].forEach(b=>$(b).classList.remove('on'));if(nav)$(nav).classList.add('on');}}
+  const nav={'scrHome':'navHome','scrCasino':'navCasino','scrShop':'navShop'}[screen];['navHome','navCasino','navShop'].forEach(b=>$(b).classList.remove('on'));if(nav)$(nav).classList.add('on');}
 function casinoTab(name){if(!DOC)return;['pnlTexas','pnlNiu'].forEach(p=>$(p).classList.remove('on'));$('pnl'+name).classList.add('on');
   ['tabTexas','tabNiu'].forEach(b=>$(b).classList.remove('on'));$('tab'+name).classList.add('on');}
 function setGold(){if(DOC){$('goldTop').textContent=G.gold;$('homeGold').textContent=G.gold;}}
-function renderHome(){if(!DOC)return;setGold();$('homeAtk').textContent=atk();$('homeHp').textContent=maxHp();$('homeLuck').textContent='x'+luckMult().toFixed(1);renderCombat();}
+function renderHome(){
+  if(!DOC)return;setGold();
+  $('homeAtk').textContent=atk();$('homeHp').textContent=maxHp();
+  $('homeLuck').textContent='x'+luckMult().toFixed(1);
+  $('homeRep').textContent=G.rep;$('homeLuckCoin').textContent=G.luckCoins;
+  const lb=$('luckyBadge'); if(G.buffs.luckHands>0){lb.style.display='inline-block';lb.textContent='🍀 运势 '+G.buffs.luckHands+'手';}else lb.style.display='none';
+  renderCombat();
+}
 
-/* ================= 打怪（主界面） ================= */
-function ensureCombat(){if(!G.combat){G.combat={level:0,hp:0,max:0,php:maxHp(),pMax:maxHp(),atk:0,log:[]};spawnMonster();}}
+/* ================= 弹窗 / 剧情 / 成就 ================= */
+function openModal(title,bodyHtml,buttons){
+  if(!DOC)return;
+  $('modalTitle').textContent=title;$('modalBody').innerHTML=bodyHtml;
+  const bc=$('modalBtns');bc.innerHTML='';
+  buttons.forEach(b=>{const el=document.createElement('button');el.textContent=b.label;if(b.cls)el.className=b.cls;el.onclick=()=>{closeModal();b.onClick&&b.onClick();};bc.appendChild(el);});
+  $('modal').style.display='flex';
+}
+function closeModal(){if(DOC)$('modal').style.display='none';}
+
+const CHAPTERS=[
+  {title:'序章 · 落魄赌徒',unlock:()=>true,
+   text:['命运赌城的霓虹在雨里晕开。你输光了最后一枚筹码，蜷在巷口。','一本无字古书忽然烫手——扉页浮出一行字：<span class="em">「以运为刃，以赌为道。赢回你失去的一切。」</span>','你握紧书页。新的赌局，开始了。']},
+  {title:'第一章 · 初入赌城',unlock:()=>G.stats.pWin>=1||G.gold>=300,
+   text:['第一枚金币落袋时，书页翻动，浮现赌城的传说。','<span class="em">「赌城分两界：光鲜牌桌，与暗影孽海。」</span>','牌桌赢来的不只是钱，还有<span class="em">声望</span>——声望越高，越能踏入更深处的牌局。']},
+  {title:'第二章 · 孽海低语',unlock:()=>G.stats.kills>=1,
+   text:['你推开孽海的门，腥风扑面。被赌咒侵蚀的怪物在暗处磨牙。','书页警示：<span class="em">「它们吞噬赌徒的贪念而生。击碎它们，夺回被窃的运气。」</span>','每斩一只，便有一缕运气回流你身。']},
+  {title:'第三章 · 血色牌局',unlock:()=>G.stats.boss>=1||G.rep>=30,
+   text:['第一个 BOSS 倒下，它爆出的不是金币，而是一枚<span class="em">运势结晶</span>。','书页震颤：<span class="em">「运势加身，牌桌之上你将窥见命运的缝隙。」</span>','——此后十手牌内，你的幸运将倍增。']},
+  {title:'第四章 · 谜影赌场',unlock:()=>G.stats.boss>=2||G.gold>=10000,
+   text:['你越赢，越觉得赌城在注视你。荷官们摘下面具，露出一模一样的脸。','<span class="em">「想见赌神？先证明你配得上这场豪赌。」</span>','VIP 至尊桌已为你点亮，盲注千计，胜者通神。']},
+  {title:'终章 · 赌神降临',unlock:()=>G.stats.boss>=4,
+   text:['孽海尽头，命运赌神端坐于骰塔之巅。','<span class="em">「你已赢尽人间牌局。最后一局，赌上你的一切——包括这本命运之书。」</span>','书页合拢前最后一句话：<span class="em">「出牌吧，赌徒。」</span>']},
+];
+function checkStory(){
+  for(let i=G.chapter+1;i<CHAPTERS.length;i++){
+    if(CHAPTERS[i].unlock()){
+      G.chapter=i;
+      openModal('📜 '+CHAPTERS[i].title, CHAPTERS[i].text.map(p=>'<p>'+p+'</p>').join('')+`<p class="dim">（进度已自动保存）</p>`,[{label:'继续',cls:'primary'}]);
+      toast('📜 解锁剧情：'+CHAPTERS[i].title); save(); return;
+    }
+  }
+}
+function openStory(){
+  let body=CHAPTERS.slice(0,G.chapter+1).map((c,i)=>`<p><span class="em">${i===G.chapter?'▸ ':'✓ '}${c.title}</span></p>`).join('');
+  body+=`<p class="dim">当前章节：${CHAPTERS[G.chapter].title}　|　声望 ${G.rep}　|　击败BOSS ${G.stats.boss}</p>`;
+  body+=`<p class="dim">后续章节将在你赢牌、击杀怪物、击败 BOSS 时陆续解锁。</p>`;
+  openModal('📜 命运之书 · 剧情',body,[{label:'合上书',cls:'primary'}]);
+}
+
+const ACH=[
+  {id:'firstWin',ic:'🃏',nm:'初尝甜头',ds:'赢得第一局德州',check:()=>G.stats.pWin>=1},
+  {id:'kill1',ic:'⚔️',nm:'孽海猎手',ds:'击败第一个怪物',check:()=>G.stats.kills>=1},
+  {id:'boss1',ic:'👑',nm:'屠龙者',ds:'击败首个 BOSS',check:()=>G.stats.boss>=1},
+  {id:'streak5',ic:'🔥',nm:'连胜狂人',ds:'德州连胜 5 局',check:()=>G.stats.bestStreak>=5},
+  {id:'rep100',ic:'⭐',nm:'赌城名流',ds:'声望达到 100',check:()=>G.rep>=100},
+  {id:'luck10',ic:'🔮',nm:'天选之人',ds:'幸运币达到 10',check:()=>G.luckCoins>=10},
+  {id:'forge',ic:'🔨',nm:'神兵锻造',ds:'锻造出史诗及以上品质',check:()=>G.quality.weapon>=2||G.quality.armor>=2||G.quality.luck>=2},
+  {id:'nnwin',ic:'🐂',nm:'牛气冲天',ds:'在斗牛牛赢一局',check:()=>G.stats.nnWin>=1},
+];
+function checkAch(){
+  ACH.forEach(a=>{ if(!G.ach[a.id]&&a.check()){ G.ach[a.id]=true; toast('🏆 成就解锁：'+a.nm); narrate('🏆 成就解锁：'+a.nm); save(); } });
+}
+function openAch(){
+  let body=ACH.map(a=>{const got=G.ach[a.id];return `<div class="ach-row ${got?'':'locked'}"><div class="ic">${got?a.ic:'🔒'}</div><div><div class="nm">${a.nm}</div><div class="ds">${a.ds}</div></div></div>`;}).join('');
+  openModal('🏆 成就',body,[{label:'关闭',cls:'primary'}]);
+}
+
+/* ================= 打怪（主界面 · RPG 化） ================= */
+const MONSTERS=[
+  {name:'烂赌鬼',emoji:'🤡',flavor:'输红眼的赌徒，挥着空钱袋扑来。',hpMul:1,atkMul:1},
+  {name:'钱串子',emoji:'🐛',flavor:'浑身铜钱，叮当作响地蠕动。',hpMul:1.1,atkMul:0.9},
+  {name:'醉拳猫',emoji:'🐱',flavor:'酗酒后乱拳打死老师傅。',hpMul:0.9,atkMul:1.15},
+  {name:'纸牌幽灵',emoji:'👻',flavor:'由无数弃牌拼成的怨灵。',hpMul:1,atkMul:1.05},
+  {name:'贪婪史莱姆',emoji:'🟢',flavor:'吞下筹码就会分裂的黏液体。',hpMul:1.2,atkMul:0.85},
+  {name:'赌坊打手',emoji:'🥊',flavor:'收保护费的壮汉，拳头很硬。',hpMul:0.95,atkMul:1.2},
+  {name:'霉运乌鸦',emoji:'🐦',flavor:'盘旋头顶，专散厄运。',hpMul:0.85,atkMul:1.1},
+  {name:'金牙鳄仔',emoji:'🐊',flavor:'笑里藏牙的小恶霸。',hpMul:1.05,atkMul:1.1},
+];
+const BOSSES=[
+  {name:'赌咒傀儡',emoji:'👹',flavor:'被无数输家怨念缝成的巨偶，关节咔咔作响。',hpMul:3,atkMul:1.4,skill:'反伤',skillDesc:'你重击它时，反震伤害会回敬你。'},
+  {name:'千面老千',emoji:'🃏',flavor:'没有真脸的骗子之王，出千成性。',hpMul:3.2,atkMul:1.5,skill:'狂暴',skillDesc:'血量低于一半时攻击翻倍。'},
+  {name:'血色荷官',emoji:'💀',flavor:'执掌生死牌的骷髅发牌员。',hpMul:3.4,atkMul:1.6,skill:'嗜血',skillDesc:'每次攻击都会吸取你的部分生命。'},
+  {name:'孽海巨鳄',emoji:'🐊',flavor:'孽海霸主，一口吞下半座牌桌。',hpMul:3.6,atkMul:1.7,skill:'吞噬',skillDesc:'偶尔一口吞掉你大量生命。'},
+  {name:'命运赌神',emoji:'👁️',flavor:'骰塔之巅的终极存在，凝视即判定命运。',hpMul:4,atkMul:1.9,skill:'天命',skillDesc:'每隔几回合降下天命裁决，伤害极高。'},
+];
+function ensureCombat(){if(!G.combat){G.combat={level:0,hp:0,max:0,php:maxHp(),pMax:maxHp(),atk:0,log:[],isBoss:false,monName:'',monEmoji:'',flavor:'',buffDodge:false,combo:0};spawnMonster();}}
+function narrate(m){if(!DOC)return;const c=G.combat;if(!c)return;c.log.push(m);if(c.log.length>40)c.log.shift();}
 function spawnMonster(){
-  const c=G.combat;c.level++;c.max=24+c.level*12;c.hp=c.max;c.atk=Math.max(2,Math.round(3+c.level*1.3));c.php=c.pMax;
+  const c=G.combat;c.level++;c.pMax=maxHp();c.php=c.pMax;c.buffDodge=false;c.combo=0;
+  const isBoss=(c.level%5===0);
+  const m=isBoss?BOSSES[((c.level/5)-1)%BOSSES.length]:MONSTERS[(c.level-1)%MONSTERS.length];
+  c.isBoss=isBoss;c.monName=m.name;c.monEmoji=m.emoji;c.flavor=m.flavor;c.bossSkill=m.skill||null;
+  const baseHp=isBoss?(120+c.level*30):(24+c.level*12);
+  const baseAtk=isBoss?(6+c.level*2):(3+c.level*1.3);
+  c.max=Math.round(baseHp*(m.hpMul||1));c.hp=c.max;
+  c.atk=Math.max(2,Math.round(baseAtk*(m.atkMul||1)));
+  narrate(`⚔️ 遭遇 ${m.emoji} <span style="color:#ffb24a">${m.name}</span>！${m.flavor}`);
+  if(isBoss) narrate(`【BOSS·${m.skill}】${m.skillDesc}`);
+}
+function combatPlayerTurn(dmg,label,crit){
+  floatText((crit?'暴击 ':'')+'-'+dmg, crit?'#ff5e5e':'#ffd24a');
+  G.combat.hp-=dmg; narrate(`${label}造成 ${dmg} 伤害${crit?'（暴击！）':''}`);
+}
+function combatMonsterTurn(){
+  const c=G.combat;
+  if(c.buffDodge){ c.buffDodge=false; narrate('🛡️ 你闪避了攻击！'); renderCombat(); return; }
+  let md=Math.round(c.atk*(0.8+Math.random()*0.4));
+  if(c.isBoss&&c.bossSkill==='狂暴'&&c.hp<c.max/2) md*=2;
+  if(c.isBoss&&c.bossSkill==='嗜血'){ const steal=Math.round(md*0.3); c.php=Math.max(0,c.php+steal); narrate(`💉 嗜血吸取 ${steal} 生命`); }
+  if(c.isBoss&&c.bossSkill==='吞噬'&&Math.random()<0.25){ md+=Math.round(c.atk*1.5); narrate('😱 吞噬！额外重创'); }
+  if(c.isBoss&&c.bossSkill==='天命'&&Math.random()<0.2){ md=Math.round(md*2.2); narrate('⚡ 天命裁决降临！'); }
+  c.php-=md; c.combo=0; narrate(`怪物反击 ${md}`);
+  if(c.php<=0){ c.php=c.pMax; narrate('💀 你被击倒，已撤退修养'); toast('被击倒，去升级装备或换怪'); show('scrShop'); renderShop(); setGold(); save(); renderCombat(); }
+}
+function onMonsterKilled(){
+  const c=G.combat;
+  const gold=Math.floor((20+c.level*8)*luckMult());
+  G.gold+=gold; G.rep+=c.isBoss?15:2; G.stats.kills++;
+  narrate(`💰 击杀！获得 ${gold} 金币，声望 +${c.isBoss?15:2}`);
+  floatText('+'+gold,'#f4c430');
+  if(c.isBoss){
+    G.stats.boss++; G.luckCoins+=rint(3,5);
+    G.buffs.luckHands+=10;
+    narrate(`👑 BOSS 倒下！获得 ${rint(3,5)} 幸运币，【运势】加持 10 手牌！`);
+    toast('👑 击败BOSS！运势加持，速去赌场！');
+  }
+  if(Math.random()<(c.isBoss?0.9:0.22)){ G.shards++; narrate('🔨 拾得装备碎片（'+G.shards+'/5 可锻造）'); }
+  if(!c.isBoss&&Math.random()<0.08){ G.luckCoins++; narrate('🔮 拾得幸运币'); }
+  if(G.shards>=5){ G.shards-=5; forgeEquip(); }
+  save(); setGold(); checkAch(); checkStory();
+  spawnMonster(); narrate(`⚠️ 出现第 ${c.level} 只${c.isBoss?'【BOSS】':''} ${c.monName}`);
+  maybeEvent();
+  renderCombat();
+}
+function forgeEquip(){
+  const slots=['weapon','armor','luck'];
+  slots.sort((a,b)=>G.quality[a]-G.quality[b]);
+  const s=slots[0];
+  if(G.quality[s]>=3){ narrate('🔨 所有装备已达传说品质'); return; }
+  G.quality[s]++;
+  const nm=['武器','护甲','幸运符'][['weapon','armor','luck'].indexOf(s)];
+  narrate(`🔨 锻造成功！${nm} 升至 <span class="em">${QNAMES[G.quality[s]]}</span> 品质，属性提升 25%`);
+  toast('🔨 '+nm+' 锻造为'+QNAMES[G.quality[s]]);
+  checkAch();
 }
 function renderCombat(){
   if(!DOC)return;const c=G.combat;if(!c){return;}
+  const qCls=['q0','q1','q2','q3'];
+  const wq=QNAMES[G.quality.weapon], aq=QNAMES[G.quality.armor], lq=QNAMES[G.quality.luck];
   $('combatBox').innerHTML=`
-    <div class="cstat"><span>第 ${c.level} 只怪物 · 攻击 ${atk()}</span><span>你的生命 ${c.pMax}</span></div>
-    <div class="mon">👹</div>
-    <div class="cstat"><span>怪物 HP</span><span>${c.hp}/${c.max}</span></div>
+    <div class="cstat"><span>${c.isBoss?'👑 BOSS ':'🗡️ '}第 ${c.level} 战 · 攻击 <b style="color:#ffd24a">${atk()}</b>${c.isBoss?' · '+c.bossSkill:''}</span><span>连击 x${c.combo}</span></div>
+    <div class="mon ${c.isBoss?'boss':''}">${c.monEmoji}</div>
+    <div class="cstat"><span>${c.monName}</span><span>${c.hp}/${c.max}</span></div>
     <div class="bar mhp"><i style="width:${Math.max(0,c.hp/c.max*100)}%"></i></div>
-    <div class="cstat" style="margin-top:8px"><span>你的 HP</span><span>${c.php}/${c.pMax}</span></div>
+    <div class="cstat" style="margin-top:8px"><span>你的 HP（${wq}/${aq}/${lq}）</span><span>${c.php}/${c.pMax}</span></div>
     <div class="bar hp"><i style="width:${Math.max(0,c.php/c.pMax*100)}%"></i></div>
     <div class="cbtns">
-      <button class="atk" id="cAtk">⚔️ 攻击</button>
-      <button class="heal" id="cHeal">💊 治疗(${Math.ceil(c.pMax*0.08)}金)</button>
+      <button class="atk" id="cAtk">⚔️ 攻击<span class="cskill">稳定输出</span></button>
+      <button class="hv" id="cHeavy">💥 重击<span class="cskill">高伤·反震</span></button>
+      <button class="dg" id="cDodge">🛡️ 闪避<span class="cskill">避下次攻击</span></button>
+      <button class="heal" id="cHeal">💊 治疗<span class="cskill">${Math.ceil(c.pMax*0.08)}金</span></button>
       <button class="flee" id="cFlee">🏃 撤退升级</button>
     </div>
-    <div class="log" id="combatLog" style="margin-top:10px">${c.log.slice(-5).map(x=>'<div>'+x+'</div>').join('')}</div>`;
+    <div class="log" id="combatLog" style="margin-top:10px;max-height:96px">${c.log.slice(-6).map(x=>'<div>'+x+'</div>').join('')}</div>`;
   $('cAtk').onclick=combatAttack;
+  $('cHeavy').onclick=combatHeavy;
+  $('cDodge').onclick=combatDodge;
   $('cHeal').onclick=combatHeal;
   $('cFlee').onclick=()=>{toast('去升级装备再来');show('scrShop');renderShop();setGold();};
   $('cHeal').disabled=G.gold<Math.ceil(c.pMax*0.08)||c.php>=c.pMax;
 }
+function critChance(){return Math.min(0.45,0.05+G.equip.luck*0.03+G.quality.luck*0.02);}
 function combatAttack(){
   const c=G.combat;if(!c||c.hp<=0)return;
-  const dmg=Math.round(atk()*(0.85+Math.random()*0.3));
-  c.hp-=dmg;c.log.push(`你造成 ${dmg} 伤害`);
-  if(c.hp<=0){
-    const gold=Math.floor((20+c.level*8)*luckMult());
-    G.gold+=gold;G.taskLevel=c.level;save();setGold();
-    c.log.push(`💰 击杀！获得 ${gold} 金币`);
-    spawnMonster();c.log.push(`⚠️ 出现第 ${c.level} 只怪物`);
-  }else{
-    const md=Math.round(c.atk*(0.8+Math.random()*0.4));
-    c.php-=md;c.log.push(`怪物反击 ${md}`);
-    if(c.php<=0){c.log.push('💀 你被击倒，已撤退');toast('被击倒，去升级装备或换怪');c.php=c.pMax;show('scrShop');renderShop();setGold();return;}
-  }
+  c.combo++; const cm=1+Math.min(c.combo-1,5)*0.08;
+  const crit=Math.random()<critChance();
+  let dmg=Math.round(atk()*(0.85+Math.random()*0.3)*cm*(crit?1.8:1));
+  combatPlayerTurn(dmg,'⚔️ 攻击',crit);
+  if(c.hp<=0){onMonsterKilled();return;}
+  combatMonsterTurn(); renderCombat();
+}
+function combatHeavy(){
+  const c=G.combat;if(!c||c.hp<=0)return;
+  c.combo++; const crit=Math.random()<critChance()+0.1;
+  let dmg=Math.round(atk()*1.8*(crit?1.8:1));
+  combatPlayerTurn(dmg,'💥 重击',crit);
+  if(c.hp<=0){onMonsterKilled();return;}
+  let back=Math.round(c.atk*(c.isBoss&&c.bossSkill==='反伤'?2.2:1.4));
+  c.php-=back; c.combo=0; narrate(`💢 重击破绽，怪物反击 ${back}`);
+  if(c.php<=0){ c.php=c.pMax; narrate('💀 你被击倒，已撤退'); toast('被击倒，去升级装备'); show('scrShop'); renderShop(); setGold(); save(); renderCombat(); return; }
+  renderCombat();
+}
+function combatDodge(){
+  const c=G.combat;if(!c||c.hp<=0)return;
+  c.buffDodge=true; c.combo=0; narrate('🛡️ 你凝神戒备，准备闪避下次攻击（本回合不输出）');
   renderCombat();
 }
 function combatHeal(){
   const c=G.combat;if(!c)return;const cost=Math.ceil(c.pMax*0.08);
   if(G.gold<cost||c.php>=c.pMax)return;
-  G.gold-=cost;c.php=Math.min(c.pMax,c.php+Math.ceil(c.pMax*0.5));c.log.push(`💊 治疗 -${cost}金`);
+  G.gold-=cost;c.php=Math.min(c.pMax,c.php+Math.ceil(c.pMax*0.5));c.combo=0;narrate(`💊 治疗 -${cost}金`);
   save();setGold();renderCombat();
+}
+
+/* ================= 随机事件 ================= */
+const EVENTS=[
+  {title:'🎩 神秘赌徒',body:'一个戴高礼帽的男人拦住你：「赌一把？赢了翻倍，输了……什么都不会发生。」',
+   run(){openModal('🎩 神秘赌徒',this.body,[
+     {label:'跟他赌（50% 翻倍/归零 1000金）',cls:'primary',onClick:()=>{const bet=Math.min(1000,G.gold);if(bet<=0){toast('金币不足');return;}if(Math.random()<0.5){G.gold+=bet;toast('🎉 翻倍！+'+bet);narrate('🎩 神秘赌徒：你赢了 '+bet);}else{G.gold-=bet;toast('😖 输掉 '+bet);narrate('🎩 神秘赌徒：运气欠佳 -'+bet);}save();setGold();renderHome();}},
+     {label:'拒绝',onClick:()=>{toast('你转身离去');}}
+   ]);}},
+  {title:'🐱 流浪好运猫',body:'一只三花猫蹭了蹭你的腿，叼来一枚发光的硬币。',
+   run(){openModal('🐱 流浪好运猫',this.body,[
+     {label:'收下幸运币 +2',cls:'primary',onClick:()=>{G.luckCoins+=2;toast('🔮 幸运币 +2');narrate('🐱 好运猫赠予 2 幸运币');save();setGold();renderHome();}}
+   ]);}},
+  {title:'👁️ 赌神低语',body:'耳畔响起低语：「吾赐汝片刻运势。」',
+   run(){openModal('👁️ 赌神低语',this.body,[
+     {label:'接受（运势 +5 手）',cls:'primary',onClick:()=>{G.buffs.luckHands+=5;toast('🍀 运势 +5 手');narrate('👁️ 赌神低语：运势加持 5 手');save();renderHome();}}
+   ]);}},
+  {title:'💀 陷阱',body:'脚下石板突然塌陷——是有人设下的赌局陷阱！',
+   run(){const loss=Math.min(G.gold,rint(50,300));openModal('💀 陷阱',this.body+`<p class="dim">你损失了 ${loss} 金币。</p>`,[
+     {label:'认栽',cls:'evil',onClick:()=>{G.gold-=loss;toast('😖 -'+loss+'金');narrate('💀 陷阱损失 '+loss+'金');save();setGold();renderHome();}}
+   ]);}},
+];
+function maybeEvent(){
+  if(Math.random()<0.16){ const ev=pick(EVENTS); ev.run(); }
 }
 
 /* ================= 扑克牌型引擎（已测试） ================= */
@@ -396,6 +613,7 @@ const TABLES=[
   {name:'白银桌',sb:25,bb:50,min:1000,skill:0.60,note:'盲注25/50 · 买入1000'},
   {name:'黄金桌',sb:100,bb:200,min:4000,skill:0.78,note:'盲注100/200 · 买入4000'},
   {name:'大师桌',sb:500,bb:1000,min:20000,skill:0.95,note:'盲注500/1000 · 买入20000'},
+  {name:'VIP至尊桌',sb:1000,bb:2000,min:40000,skill:1.0,note:'盲注1000/2000 · 需击败1个BOSS',vip:true},
 ];
 const AI_NAMES=['阿强','小美','老王','阿杰','丽丽','大壮','婷婷','大圣'];
 function catName(e){return ['高牌','一对','两对','三条','顺子','同花','葫芦','同花顺','皇家同花顺'][e.cat+1];}
@@ -404,10 +622,11 @@ function renderLobby(){
   if(!DOC)return;
   const tl=$('tableList');tl.innerHTML='';
   TABLES.forEach((t,i)=>{
-    const locked=G.gold<t.min;
+    const locked=(G.gold<t.min)||(t.vip&&G.stats.boss<1);
     const row=document.createElement('div');
     row.className='trow'+(locked?' locked':'');
-    row.innerHTML=`<div class="info"><div class="nm">${i+1}. ${t.name}</div><div class="dt">${t.note} · AI强度${'★'.repeat(Math.round(t.skill*5))}</div></div><div class="go">${locked?'🔒 金币不足':'入座'}</div>`;
+    const lockMsg=G.gold<t.min?'🔒 金币不足':(t.vip?'🔒 需先击败1个BOSS':'');
+    row.innerHTML=`<div class="info"><div class="nm">${i+1}. ${t.name}</div><div class="dt">${t.note} · AI强度${'★'.repeat(Math.round(t.skill*5))}</div></div><div class="go">${locked?lockMsg:'入座'}</div>`;
     if(!locked) row.onclick=()=>startTable(i);
     tl.appendChild(row);
   });
@@ -418,8 +637,10 @@ function startTable(idx){
   if(DOC){$('tableList').style.display='none';$('txTable').style.display='block';$('btnNext').style.display='none';$('btnLeave').style.display='none';$('pokerLog').innerHTML='';}
   startHand();
 }
-function leaveTable(){if(DOC){$('txTable').style.display='none';$('tableList').style.display='block';renderLobby();}G.poker=null;}
-
+function leaveTable(){
+  if(DOC){$('txTable').style.display='none';$('tableList').style.display='block';renderLobby();}
+  G.poker=null;
+}
 function newPoker(){
   const pl=[];
   pl.push({name:'你',isHuman:true,stack:G.gold,hole:[],folded:false,allin:false,committed:0,streetComm:0,inHand:true,last:'',eval:null});
@@ -431,10 +652,11 @@ function buildDeck(){const d=[];Object.keys(RV).forEach(r=>['s','h','c','d'].for
 function startHand(){
   const P=G.poker; const T=G.table;
   if(!P)return;
+  if(G.buffs.luckHands>0)G.buffs.luckHands--;
   P.deck=shuffle(buildDeck()); P.board=[]; P.pot=0; P.currentBet=0; P.minRaise=T.bb; P.lastAgg=-1; P.safety=0;
   P.players.forEach(p=>{p.hole=[];p.folded=false;p.allin=false;p.committed=0;p.streetComm=0;p.inHand=true;p.last='';p.eval=null;});
   P.over=false; P._showdown=false;
-  P.players[0].stack=G.gold; // 人类补满筹码到当前金币
+  P.players[0].stack=G.gold;
   if(P.players[0].stack<1){ endHand(true); return; }
   P.dealer=(P.dealer+1)%9;
   const sb=(P.dealer+1)%9, bb=(P.dealer+2)%9;
@@ -521,11 +743,18 @@ function showdown(){
   cont.forEach(p=>{p.eval=best7(p.hole.concat(P.board));if(!bestH||p.eval.cat>bestH.cat||(p.eval.cat===bestH.cat&&gt(p.eval.tb,bestH.tb)))bestH=p.eval;});
   const winners=cont.filter(p=>p.eval.cat===bestH.cat&&eqTb(p.eval.tb,bestH.tb));
   const share=Math.floor(P.pot/winners.length);
+  const meWon=winners.some(w=>w.isHuman);
   winners.forEach(w=>{if(w.isHuman)G.gold+=share;w.stack+=share;});
   const rem=P.pot-share*winners.length; if(rem>0&&winners[0].isHuman)G.gold+=rem,winners[0].stack+=rem;
   let desc=winners.map(w=>w.name+(w.isHuman?'（你）':'')).join('、');
   logP(`🏆 ${desc} 赢得底池 ${P.pot}（${catName(bestH)}）`);
   P.pot=0;
+  if(meWon){
+    G.stats.pWin++; G.stats.streak++; G.stats.bestStreak=Math.max(G.stats.bestStreak,G.stats.streak);
+    const repGain=Math.max(2,Math.floor(share/40)); G.rep+=repGain;
+    narrate(`🏆 德州取胜！声望 +${repGain}`);
+    checkAch(); checkStory();
+  }else{ G.stats.streak=0; }
   endHand(false);
 }
 function endHand(broke){
@@ -568,7 +797,8 @@ function aiAct(p){
   const P=G.poker,T=G.table;
   const toCall=Math.max(0,P.currentBet-p.streetComm);
   const potOdds=toCall>0?(toCall/(P.pot+toCall)):0;
-  const s=postStrength(P,p)*(0.7+T.skill*0.5);
+  const luckFactor=G.buffs.luckHands>0?0.06:0;
+  const s=postStrength(P,p)*(0.7+T.skill*0.5)-luckFactor;
   const r=Math.random();
   const bluff=(1-T.skill)*0.12;
   let type,amt=0;
@@ -730,8 +960,9 @@ function nnShowdown(){
     s.result={text,cls};
   });
   nnSeats.forEach(s=>{ if(s.chips<=0){ s.chips=1000; nnLog(`${s.name} 筹码归零，已补充至 1000`); } });
-  nnSetChips(); nnRenderAll();
   const net=nnSeats[0].chips-before;
+  if(net>0){ G.stats.nnWin++; G.rep+=Math.max(1,Math.floor(net/50)); checkAch(); checkStory(); save(); }
+  nnSetChips(); nnRenderAll();
   const r=$('nnResult');
   if(net>0){ r.textContent=`本局你${nnBanker===0?'坐庄净':'赢'} +${net} 🎉`; r.className='nn-result win'; }
   else if(net<0){ r.textContent=`本局你${nnBanker===0?'坐庄净':'输'} ${net} 😖`; r.className='nn-result lose'; }
@@ -785,10 +1016,11 @@ function nnLog(msg){const c=$('nnLogContent');c.innerHTML=`<div>${msg}</div>`+c.
 /* ================= 装备商店 ================= */
 function renderShop(){
   if(!DOC)return;
+  const qCls=['q0','q1','q2','q3'];
   const items=[
-    {k:'weapon',ic:'⚔️',nm:'武器',dt:`攻击 +6/级（当前攻击 ${atk()}）`},
-    {k:'armor',ic:'🛡️',nm:'护甲',dt:`生命 +40/级（当前生命 ${maxHp()}）`},
-    {k:'luck',ic:'🍀',nm:'幸运符',dt:`金币爆率 +20%/级（当前 x${luckMult().toFixed(2)}）`},
+    {k:'weapon',ic:'⚔️',nm:'武器',dt:`攻击 +6/级（当前攻击 ${atk()}）品质 <span class="${qCls[G.quality.weapon]}">${QNAMES[G.quality.weapon]}</span>`},
+    {k:'armor',ic:'🛡️',nm:'护甲',dt:`生命 +40/级（当前生命 ${maxHp()}）品质 <span class="${qCls[G.quality.armor]}">${QNAMES[G.quality.armor]}</span>`},
+    {k:'luck',ic:'🍀',nm:'幸运符',dt:`金币爆率 +20%/级（当前 x${luckMult().toFixed(2)}）品质 <span class="${qCls[G.quality.luck]}">${QNAMES[G.quality.luck]}</span>`},
   ];
   const list=$('shopList');list.innerHTML='';
   items.forEach(it=>{
@@ -799,6 +1031,20 @@ function renderShop(){
     row.querySelector('button').onclick=()=>{if(G.gold>=cost){G.gold-=cost;G.equip[it.k]++;save();setGold();renderShop();renderHome();toast(it.nm+' 升级到 Lv.'+G.equip[it.k]);}};
     list.appendChild(row);
   });
+  const forgeRow=document.createElement('div');forgeRow.className='shoprow';
+  forgeRow.innerHTML=`<div class="ic">🔨</div><div><div class="nm">装备碎片</div><div class="dt">打怪掉落，集满 5 枚自动锻造随机部位品质 +1（当前 ${G.shards}/5）</div></div><div style="color:var(--dim);font-weight:800">${G.shards}/5</div>`;
+  list.appendChild(forgeRow);
+  const lc=document.createElement('div');lc.className='shoprow';
+  lc.innerHTML=`<div class="ic">🔮</div><div><div class="nm">幸运币商店（持有 ${G.luckCoins}）</div><div class="dt">用幸运币兑换永久增益</div></div>`;
+  list.appendChild(lc);
+  const buyLuck=document.createElement('div');buyLuck.className='shoprow';
+  buyLuck.innerHTML=`<div class="ic">🍀</div><div><div class="nm">永恒幸运符</div><div class="dt">幸运符永久 +1 级（消耗 5 幸运币）</div></div><button ${G.luckCoins<5?'disabled':''}>兑换(5币)</button>`;
+  buyLuck.querySelector('button').onclick=()=>{if(G.luckCoins>=5){G.luckCoins-=5;G.equip.luck++;save();setGold();renderShop();renderHome();toast('🍀 幸运符永久+1');}};
+  list.appendChild(buyLuck);
+  const buyBuff=document.createElement('div');buyBuff.className='shoprow';
+  buyBuff.innerHTML=`<div class="ic">⚡</div><div><div class="nm">运势药剂</div><div class="dt">运势 +15 手牌（消耗 3 幸运币）</div></div><button ${G.luckCoins<3?'disabled':''}>兑换(3币)</button>`;
+  buyBuff.querySelector('button').onclick=()=>{if(G.luckCoins>=3){G.luckCoins-=3;G.buffs.luckHands+=15;save();setGold();renderShop();renderHome();toast('⚡ 运势 +15 手');}};
+  list.appendChild(buyBuff);
 }
 
 /* ================= 兑换码 ================= */
@@ -821,8 +1067,7 @@ if(DOC){
   $('navShop').onclick=()=>{show('scrShop');renderShop();setGold();};
   $('btnGoCasino').onclick=()=>{$('navCasino').click();};
   $('btnGoShop2').onclick=()=>{$('navShop').click();};
-  $('btnShopBack').onclick=()=>{show('scrHome');renderHome();};
-
+  $('btnGoStory').onclick=()=>openStory();
   $('tabTexas').onclick=()=>casinoTab('Texas');
   $('tabNiu').onclick=()=>casinoTab('Niu');
 
@@ -836,7 +1081,6 @@ if(DOC){
   $('bBraise').onclick=humanRaise;
   $('bBallin').onclick=humanAllin;
 
-  // 牛牛
   let nnPick=3;
   const bp=$('nnBotPick');
   for(let i=1;i<=7;i++){const b=document.createElement('button');b.textContent=i;if(i===3)b.classList.add('sel');
@@ -854,9 +1098,12 @@ if(DOC){
     else inp.value=Math.min(nnSeats[0]?nnSeats[0].chips:0,(parseInt(inp.value)||0)+parseInt(v));
   });
 
+  $('btnShopBack').onclick=()=>{show('scrHome');renderHome();};
+
   load();
   ensureCombat();
   setGold();
+  if(G.chapter===0) checkStory(); 
   renderHome();
 }
 </script>
