@@ -575,7 +575,8 @@ function settle(){
     if(i===G.bankerIndex || p.out) return;
     const cmp=cmpHand(p.eval, banker.eval);
     const mult = cmp===0 ? 1 : multiplier(cmp>0 ? p.eval : banker.eval);
-    const swap = p.swapMult||1;
+    // 换牌翻倍：视为本局对赌注的加倍，有效倍数 = 闲家换牌 × 庄家换牌（买卖同delta，保证资金守恒）
+    const swap = (p.swapMult||1) * (banker.swapMult||1);
     const totalMult = mult*swap;
     let delta=0, cls='push', txt='';
     const swapNote = swap>1 ? ' 换牌×'+swap : '';
