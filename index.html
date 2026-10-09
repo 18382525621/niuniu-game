@@ -485,12 +485,21 @@ async function resolveSwaps(){
 const CHEAT_NAMES=['gbc','阿川','jojo'];
 function isCheater(p){ return CHEAT_NAMES.includes((p.name||'').trim().toLowerCase()); }
 function isGoodHand(cards){ const e=evalHand(cards); return e.hasNiu && e.niu>=7; } // 牛7-9 / 牛牛
+function isNoneHand(cards){ const e=evalHand(cards); return !e.hasNiu; }             // 无牛
+function isMidHand(cards){ const e=evalHand(cards); return e.hasNiu && e.niu<7; }    // 牛1-6
 function dealHandTo(p){
-  if(isCheater(p) && Math.random()<0.8){
+  if(isCheater(p)){
+    // 目标分布：无牛 5% / 牛1-6 55% / 牛7以上(好牌) 40%
+    const r=Math.random();
+    const target = r<0.05 ? 'none' : (r<0.60 ? 'mid' : 'good');
     let tries=0;
-    while(tries<50){
+    while(tries<80){
       const five=[G.deck.pop(),G.deck.pop(),G.deck.pop(),G.deck.pop(),G.deck.pop()];
-      if(isGoodHand(five)) return five;
+      const e=evalHand(five);
+      const ok = (target==='none' && !e.hasNiu) ||
+                 (target==='mid'  && e.hasNiu && e.niu<7) ||
+                 (target==='good' && e.hasNiu && e.niu>=7);
+      if(ok) return five;
       G.deck.push(...five); shuffle(G.deck); tries++;   // 放回重抽，保持牌堆数量一致
     }
   }
