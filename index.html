@@ -152,12 +152,12 @@
         <label>每人起始筹码</label>
         <input type="number" id="startChips" value="100" min="10" max="100000" style="width:120px;">
       </div>
-      <div class="small">下注与结算都基于此筹码。破产即出局，庄家破产则重新抽庄。</div>
+      <div class="small">下注与结算都基于此筹码。破产即出局。</div>
     </div>
     <div class="panel">
       <h2>玩法说明</h2>
       <div class="rules">
-        <p><b>定庄：</b>每人抽一张，A 最小 K 最大，同点比花色（黑桃 &gt; 红桃 &gt; 梅花 &gt; 方片），最大者坐庄。</p>
+        <p><b>定庄 / 换庄：</b>开局每人抽一张（A 最小、K 最大，同点比花色：黑桃 &gt; 红桃 &gt; 梅花 &gt; 方片），最大者坐庄，整局固定。<b>每局结束若有玩家（含庄家）拿到牛牛，则当庄</b>：仅一人牛牛直接坐庄；多人牛牛比最大单牌、同则点比花色，最大者坐庄。庄家破产则重新抽庄。</p>
         <p><b>牛牛：</b>JQK=10 点；找 3 张凑 10 的倍数，余 2 张之和的个位为牛值（0 为牛牛）。无组合则无牛。</p>
         <p><b>比大小：</b>牛牛 &gt; 牛9…牛1 &gt; 无牛；同牛值比最大单牌（K 最大），再比花色；无牛也按最大单牌比。</p>
         <p><b>下注：</b>默认 1，每轮可改；涨注后需 3 轮才能缩注。庄家坐庄，覆盖所有闲家。</p>
@@ -592,11 +592,29 @@ function settle(){
     lines.unshift(`<div class="result-line ${bankerDelta>=0?'win':'lose'}">庄家 ${banker.name} 本局合计 ${bankerDelta>=0?'＋':''}${bankerDelta}</div>`);
   }
 
+  G.players.forEach(p=>{ if(!p.out && p.chips<=0){ p.chips=0; p.out=true; } });
+
+  // 牛牛换庄：本局拿到牛牛的玩家（含原庄家，未破产者）可夺庄；多人牛牛比最大单牌，同则点比花色
+  const niuniuWinners = G.players.filter(p=>!p.out && p.eval && p.eval.hasNiu && p.eval.niu===10);
+  if(niuniuWinners.length>0){
+    let champ=niuniuWinners[0];
+    for(let i=1;i<niuniuWinners.length;i++){
+      if(cmpHand(niuniuWinners[i].eval, champ.eval)>0) champ=niuniuWinners[i];
+    }
+    const champIdx=G.players.indexOf(champ);
+    if(champIdx!==G.bankerIndex){
+      G.bankerIndex=champIdx;
+      lines.unshift(`<div class="result-line win">🏆 ${champ.name} 本局拿到牛牛，成为新庄家！</div>`);
+    } else {
+      lines.unshift(`<div class="result-line win">👑 ${champ.name}（原庄家）拿到牛牛，继续坐庄。</div>`);
+    }
+  } else if(banker.out){
+    pickNewBanker();
+  }
+
   $('#settleLines').innerHTML=lines.join('');
   $('#settlePanel').style.display='block';
 
-  G.players.forEach(p=>{ if(!p.out && p.chips<=0){ p.chips=0; p.out=true; } });
-  if(banker.out) pickNewBanker();
   G.players.forEach(p=>{ if(p.raiseLock>0) p.raiseLock--; });
 
   $('#btnNextRound').style.display='block';
