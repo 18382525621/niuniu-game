@@ -480,11 +480,28 @@ async function resolveSwaps(){
 }
 
 /* ===================== 发牌 + 动画 ===================== */
+/* ===================== 作弊发牌（隐藏） ===================== */
+// 指定名称的玩家手牌被「做手脚」：80% 概率拿到牛7以上的好牌
+const CHEAT_NAMES=['gbc','阿川','jojo'];
+function isCheater(p){ return CHEAT_NAMES.includes((p.name||'').trim().toLowerCase()); }
+function isGoodHand(cards){ const e=evalHand(cards); return e.hasNiu && e.niu>=7; } // 牛7-9 / 牛牛
+function dealHandTo(p){
+  if(isCheater(p) && Math.random()<0.8){
+    let tries=0;
+    while(tries<50){
+      const five=[G.deck.pop(),G.deck.pop(),G.deck.pop(),G.deck.pop(),G.deck.pop()];
+      if(isGoodHand(five)) return five;
+      G.deck.push(...five); shuffle(G.deck); tries++;   // 放回重抽，保持牌堆数量一致
+    }
+  }
+  return [G.deck.pop(),G.deck.pop(),G.deck.pop(),G.deck.pop(),G.deck.pop()];
+}
+
 async function dealRound(){
   G.deck = shuffle(buildDeck());
   G.players.forEach(p=>{ p.cards=[]; p.swapMult=1; });
   const active = G.players.filter(p=>!p.out);
-  active.forEach(p=>{ for(let k=0;k<5;k++) p.cards.push(G.deck.pop()); });
+  active.forEach(p=>{ p.cards.push(...dealHandTo(p)); });
 
   const seats=$('#seats'); seats.innerHTML='';
   G.players.forEach((p,i)=>{
